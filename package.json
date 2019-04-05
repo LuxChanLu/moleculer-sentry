@@ -1,6 +1,6 @@
 {
   "name": "moleculer-sentry",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Moleculer service for sentry error monitoring",
   "main": "index.js",
   "directories": {
@@ -9,7 +9,7 @@
   "scripts": {
     "ci": "jest --watch",
     "test": "jest --coverage",
-    "lint": "eslint --ext=.js src test",
+    "lint": "eslint --ext=.js src test index.js",
     "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
