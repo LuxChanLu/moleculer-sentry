@@ -10,8 +10,7 @@
 [![Downloads](https://img.shields.io/npm/dm/moleculer-sentry.svg)](https://www.npmjs.com/package/moleculer-sentry)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FYourSoftRun%2Fmoleculer-sentry.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FYourSoftRun%2Fmoleculer-sentry?ref=badge_shield)
 
-
-## How to use it ?
+## How to use it
 ```js
 const SentryMixin = require('moleculer-sentry')
 
