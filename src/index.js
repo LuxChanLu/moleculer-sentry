@@ -105,7 +105,7 @@ module.exports = {
 	},
 	async stopped() {
     if (this.isSentryReady()) {
-      await Sentry.close()
+      await Sentry.flush()
       SentryUtils.getGlobalObject().__SENTRY__ = undefined
     }
 	}
