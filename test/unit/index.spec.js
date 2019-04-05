@@ -1,8 +1,8 @@
-const { ServiceBroker } = require("moleculer")
-const Sentry = require("@sentry/node")
-const SentryHub = require("@sentry/hub")
+const { ServiceBroker } = require('moleculer')
+const Sentry = require('@sentry/node')
+const SentryHub = require('@sentry/hub')
 
-const SentryService = require("../../index.js")
+const SentryService = require('../../index.js')
 const SentryServiceWithDSN = { ...SentryService, settings: { dsn: 'https://abc:xyz@localhost:1234/123' } }
 
 describe('Sentry init', () => {
