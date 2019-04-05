@@ -1,6 +1,6 @@
 {
   "name": "moleculer-sentry",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Moleculer service for sentry error monitoring",
   "main": "index.js",
   "directories": {
@@ -36,7 +36,9 @@
     "node": ">= 6.x.x"
   },
   "dependencies": {
-    "@sentry/node": "^5.0.5",
+    "@sentry/node": "^5.0.5"
+  },
+  "devDependencies": {
     "coveralls": "^3.0.3",
     "eslint": "^5.16.0",
     "jest": "^24.7.1",
