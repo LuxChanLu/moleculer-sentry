@@ -1,3 +1,9 @@
+.codeclimate.yml
+.editorconfig
+.eslintrc.js
+.travis.yml
+test/
+
 .vs
 *~
 # Logs
