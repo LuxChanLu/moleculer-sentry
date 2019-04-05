@@ -1,11 +1,10 @@
 language: node_js
 sudo: false
-dist: precise
+dist: xenial
 
 node_js:
   - "10"
   - "8"
-  - "6"
 
 cache:
   directories:
