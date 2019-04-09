@@ -1,6 +1,6 @@
 {
   "name": "moleculer-sentry",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Moleculer service for sentry error monitoring",
   "main": "index.js",
   "directories": {
