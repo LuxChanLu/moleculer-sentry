@@ -36,7 +36,8 @@
     "node": ">= 6.x.x"
   },
   "dependencies": {
-    "@sentry/node": "^5.0.5"
+    "@sentry/node": "^5.0.5",
+    "@sentry/utils": "^5.0.6"
   },
   "devDependencies": {
     "coveralls": "^3.0.3",

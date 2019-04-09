@@ -7,7 +7,7 @@
 'use strict'
 
 const Sentry = require('@sentry/node')
-const SentryUtils = require('@sentry/utils/misc')
+const SentryUtils = require('@sentry/utils')
 
 module.exports = {
   name: 'sentry',
