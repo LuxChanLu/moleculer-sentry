@@ -32,7 +32,7 @@ module.exports = {
 	 */
   events: {
     'metrics.trace.span.finish'(metric) {
-      if (metric.error && this.isSentryReady()) {
+      if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
         this.sendError(metric)
       }
     }
@@ -90,10 +90,14 @@ module.exports = {
 
         Sentry.captureEvent({
           message: metric.error.message,
-          stacktrace: metric.error.stack
+          stacktrace: !Array.isArray(metric.error.stack) ? [metric.error.stack] : metric.error.stack
         })
       })
     },
+
+    /**
+		 * Check if sentry is configured or not
+		 */
     isSentryReady() {
       return Sentry.getCurrentHub().getClient() !== undefined
     }
