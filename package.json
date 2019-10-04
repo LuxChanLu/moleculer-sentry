@@ -10,7 +10,9 @@
     "ci": "jest --watch",
     "test": "jest --coverage",
     "lint": "eslint --ext=.js src test index.js",
-    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -37,7 +39,8 @@
   },
   "dependencies": {
     "@sentry/node": "^5.5.0",
-    "@sentry/utils": "^5.5.0"
+    "@sentry/utils": "^5.5.0",
+    "snyk": "^1.230.5"
   },
   "devDependencies": {
     "coveralls": "^3.0.5",
@@ -46,5 +49,6 @@
     "jest": "^24.8.0",
     "jest-cli": "^24.8.0",
     "moleculer": "^0.13.9"
-  }
+  },
+  "snyk": true
 }
