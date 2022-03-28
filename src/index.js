@@ -20,6 +20,8 @@ module.exports = {
     sentry: {
       /** @type {String} DSN given by sentry. */
       dsn: null,
+      /** @type {String} Name of event fired by "Event" exported in tracing. */
+      tracingEventName: '$tracing.spans',
       /** @type {Object} Additional options for `Sentry.init`. */
       options: {},
       /** @type {String?} Name of the meta containing user infos. */
@@ -52,13 +54,15 @@ module.exports = {
    * Events
    */
   events: {
-    '$tracing.spans'(metrics) {
-      metrics.forEach((metric) => {
-        if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
-          this.sendSentryError(metric)
-        }
-      })
-    }
+    // bind event listeners
+    '**'(payload, sender, event) {
+      // only listen to specifig tracing event
+      if (event !== this.settings.sentry.tracingEventName) {
+        return
+      }
+
+      this.onTracingEvent(payload)
+    },
   },
 
   /**
@@ -144,6 +148,20 @@ module.exports = {
      */
     isSentryReady() {
       return Sentry.getCurrentHub().getClient() !== undefined
+    },
+
+    /**
+     * Tracing event handler
+     *
+     * @param metrics
+     * @return void
+     */
+    onTracingEvent(metrics) {
+      metrics.forEach((metric) => {
+        if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
+          this.sendSentryError(metric)
+        }
+      })
     }
   },
 

@@ -2,10 +2,13 @@ const { ServiceBroker } = require('moleculer')
 const Sentry = require('@sentry/node')
 const SentryHub = require('@sentry/hub')
 
-const SentryService = require('../../index.js')
+const SentryMixin = require('../../index.js')
+const SentryService = {
+  mixins: [SentryMixin],
+}
 const SentryServiceWithDSN = {
-  ...SentryService,
-  settings: { ...SentryService.settings, sentry: { dsn: 'https://abc:xyz@localhost:1234/123' } }
+  mixins: [SentryMixin],
+  settings: { sentry: { dsn: 'https://abc:xyz@localhost:1234/123' } }
 }
 
 describe('Sentry init', () => {
@@ -71,8 +74,8 @@ describe('Events', () => {
 describe('sendError scope', () => {
   const broker = new ServiceBroker({ logger: false })
   const service = broker.createService({
-    ...SentryServiceWithDSN,
-    settings: { ...SentryServiceWithDSN.settings, sentry: { userMetaKey: 'user' } }
+    mixins: [SentryServiceWithDSN],
+    settings: { sentry: { userMetaKey: 'user' } }
   })
 
   beforeAll(() => broker.start())
