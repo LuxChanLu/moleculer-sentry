@@ -7,7 +7,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/LuxChanLu/moleculer-sentry/badge.svg)](https://snyk.io/test/github/LuxChanLu/moleculer-sentry)
 
 [![Downloads](https://img.shields.io/npm/dm/moleculer-sentry.svg)](https://www.npmjs.com/package/moleculer-sentry)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FLuxChanLu%2Fmoleculer-sentry.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FLuxChanLu%2Fmoleculer-sentry?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLuxChanLu%2Fmoleculer-sentry.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FLuxChanLu%2Fmoleculer-sentry?ref=badge_shield)
 
 ## Usage
 
