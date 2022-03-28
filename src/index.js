@@ -114,6 +114,26 @@ module.exports = {
     },
 
     /**
+     * We need to normalize the stack trace, since Sentry will throw an error unless it's a valid raw stack trace
+     *
+     * @param stack
+     * @returns {null|*[]|*}
+     */
+    getNormalizedStackTrace(stack) {
+      // empty stack trace is not parseable by sentry,
+      if (!stack) {
+        return null
+      }
+
+      // if stacktrace is present as a string, wrap it into an array
+      if (!Array.isArray(stack)) {
+        return [stack];
+      }
+
+      return stack;
+    },
+
+    /**
      * Send error to sentry, based on the metric error
      *
      * @param {Object} metric
@@ -138,7 +158,7 @@ module.exports = {
 
         Sentry.captureEvent({
           message: metric.error.message,
-          stacktrace: !Array.isArray(metric.error.stack) ? [metric.error.stack] : metric.error.stack
+          stacktrace: this.getNormalizedStackTrace(metric.error.stack)
         })
       })
     },
