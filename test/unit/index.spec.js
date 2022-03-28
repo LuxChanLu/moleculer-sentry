@@ -47,7 +47,7 @@ describe('Events', () => {
     service.isSentryReady = jest.fn(() => false)
     service.sendSentryError = jest.fn()
 
-    broker.emit('$tracing.spans', [{ error: {} }])
+    broker.emit(SentryMixin.settings.sentry.tracingEventName, [{ error: {} }])
 
     expect(service.sendSentryError).not.toHaveBeenCalled()
     service.isSentryReady = oldSentryReady
@@ -56,7 +56,7 @@ describe('Events', () => {
   it('should not sendError (no error)', () => {
     service.sendSentryError = jest.fn()
 
-    broker.emit('$tracing.spans', [{}])
+    broker.emit(SentryMixin.settings.sentry.tracingEventName, [{}])
 
     expect(service.sendSentryError).not.toHaveBeenCalled()
   })
@@ -65,7 +65,7 @@ describe('Events', () => {
     service.sendSentryError = jest.fn()
     const error = { type: 'test', message: 'test' }
 
-    broker.emit('$tracing.spans', [{ error }])
+    broker.emit(SentryMixin.settings.sentry.tracingEventName, [{ error }])
 
     expect(service.sendSentryError).toHaveBeenCalledWith({ error })
   })
@@ -175,14 +175,14 @@ describe('sendError with shouldReport', () => {
   it('should report error', () => {
     service.sendSentryError = jest.fn()
     const error = { type: 'test', message: 'test', code: 42, stack: 'stack' }
-    broker.emit('$tracing.spans', [{ error }])
+    broker.emit(SentryMixin.settings.sentry.tracingEventName, [{ error }])
     expect(service.sendSentryError).toHaveBeenCalledTimes(1)
   })
 
   it('should not report error', () => {
     service.sendSentryError = jest.fn()
     const error = { type: 'test', message: 'test', code: 24, stack: 'stack' }
-    broker.emit('$tracing.spans', [{ error }])
+    broker.emit(SentryMixin.settings.sentry.tracingEventName, [{ error }])
     expect(service.sendSentryError).not.toHaveBeenCalledTimes(1)
   })
 
