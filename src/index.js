@@ -13,8 +13,8 @@ module.exports = {
   name: 'sentry',
 
   /**
-	 * Default settings
-	 */
+   * Default settings
+   */
   settings: {
     /** @type {String} DSN given by sentry. */
     dsn: null,
@@ -28,8 +28,8 @@ module.exports = {
   },
 
   /**
-	 * Events
-	 */
+   * Events
+   */
   events: {
     'metrics.trace.span.finish'(metric) {
       if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
@@ -39,15 +39,15 @@ module.exports = {
   },
 
   /**
-	 * Methods
-	 */
+   * Methods
+   */
   methods: {
     /**
-		 * Get service name from metric event (Imported from moleculer-jaeger)
-		 *
-		 * @param {Object} metric
-		 * @returns {String}
-		 */
+     * Get service name from metric event (Imported from moleculer-jaeger)
+     *
+     * @param {Object} metric
+     * @returns {String}
+     */
     getServiceName(metric) {
       if (!metric.service && metric.action) {
         const parts = metric.action.name.split('.')
@@ -58,22 +58,22 @@ module.exports = {
     },
 
     /**
-		 * Get span name from metric event. By default it returns the action name (Imported from moleculer-jaeger)
-		 *
-		 * @param {Object} metric
-		 * @returns  {String}
-		 */
+     * Get span name from metric event. By default it returns the action name (Imported from moleculer-jaeger)
+     *
+     * @param {Object} metric
+     * @returns  {String}
+     */
     getSpanName(metric) {
       return metric.action ? metric.action.name : metric.name
     },
 
     /**
-		 * Send error to sentry, based on the metric error
-		 *
-		 * @param {Object} metric
-		 */
+     * Send error to sentry, based on the metric error
+     *
+     * @param {Object} metric
+     */
     sendError(metric) {
-      Sentry.withScope(scope => {
+      Sentry.withScope((scope) => {
         scope.setTag('id', metric.requestID)
         scope.setTag('service', this.getServiceName(metric))
         scope.setTag('span', this.getSpanName(metric))
@@ -96,8 +96,8 @@ module.exports = {
     },
 
     /**
-		 * Check if sentry is configured or not
-		 */
+     * Check if sentry is configured or not
+     */
     isSentryReady() {
       return Sentry.getCurrentHub().getClient() !== undefined
     }
