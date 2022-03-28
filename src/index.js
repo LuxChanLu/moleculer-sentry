@@ -55,7 +55,7 @@ module.exports = {
     '$tracing.spans'(metrics) {
       metrics.forEach((metric) => {
         if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
-          this.sendError(metric)
+          this.sendSentryError(metric)
         }
       })
     }
@@ -114,7 +114,7 @@ module.exports = {
      *
      * @param {Object} metric
      */
-    sendError(metric) {
+    sendSentryError(metric) {
       Sentry.withScope((scope) => {
         scope.setTag('id', metric.requestID)
         scope.setTag('service', this.getServiceName(metric))
