@@ -52,10 +52,12 @@ module.exports = {
    * Events
    */
   events: {
-    'metrics.trace.span.finish'(metric) {
-      if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
-        this.sendError(metric)
-      }
+    '$tracing.spans'(metrics) {
+      metrics.forEach((metric) => {
+        if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
+          this.sendError(metric)
+        }
+      })
     }
   },
 
