@@ -9,8 +9,7 @@
   "scripts": {
     "ci": "jest --watch",
     "test": "jest --coverage",
-    "lint": "eslint --ext=.js src test index.js",
-    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "lint": "eslint --ext=.js src test index.js"
   },
   "repository": {
     "type": "git",
