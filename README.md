@@ -5,7 +5,6 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/42a2b5016bde4f2197f28389e221c61d)](https://www.codacy.com/gh/LuxChanLu/moleculer-sentry/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=LuxChanLu/moleculer-sentry&amp;utm_campaign=Badge_Grade)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8fbbbade0e11725f5c57/maintainability)](https://codeclimate.com/github/LuxChanLu/moleculer-sentry/maintainability)
 [![Known Vulnerabilities](https://snyk.io/test/github/LuxChanLu/moleculer-sentry/badge.svg)](https://snyk.io/test/github/LuxChanLu/moleculer-sentry)
-
 [![Downloads](https://img.shields.io/npm/dm/moleculer-sentry.svg)](https://www.npmjs.com/package/moleculer-sentry)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLuxChanLu%2Fmoleculer-sentry.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FLuxChanLu%2Fmoleculer-sentry?ref=badge_shield)
 
