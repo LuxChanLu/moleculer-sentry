@@ -45,6 +45,6 @@
     "eslint-plugin-jest": "^22.17.0",
     "jest": "^24.9.0",
     "jest-cli": "^24.9.0",
-    "moleculer": "^0.13.11"
+    "moleculer": "^0.14.19"
   }
 }

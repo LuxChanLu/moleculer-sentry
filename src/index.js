@@ -13,41 +13,68 @@ module.exports = {
   name: 'sentry',
 
   /**
-	 * Default settings
-	 */
+   * Default settings
+   */
   settings: {
-    /** @type {String} DSN given by sentry. */
+    /** @type {Object?} Sentry configuration wrapper. */
+    sentry: {
+      /** @type {String} DSN given by sentry. */
+      dsn: null,
+      /** @type {String} Name of event fired by "Event" exported in tracing. */
+      tracingEventName: '$tracing.spans',
+      /** @type {Object} Additional options for `Sentry.init`. */
+      options: {},
+      /** @type {String?} Name of the meta containing user infos. */
+      userMetaKey: null,
+    },
+    /**
+     * @deprecated
+     * @type {String} DSN given by sentry.
+     */
     dsn: null,
-    /** @type {Object?} Additional options for `Sentry.init` */
+    /**
+     * @deprecated
+     * @type {Object?} Additional options for `Sentry.init`
+     */
     options: {},
-    /** @type {Object?} Options for the sentry scope */
+    /**
+     * @deprecated
+     * @type {Object?} Options for the sentry scope
+     */
     scope: {
-      /** @type {String?} Name of the meta containing user infos */
+      /**
+       * @deprecated
+       * @type {String?} Name of the meta containing user infos
+       */
       user: null
     }
   },
 
   /**
-	 * Events
-	 */
+   * Events
+   */
   events: {
-    'metrics.trace.span.finish'(metric) {
-      if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
-        this.sendError(metric)
+    // bind event listeners
+    '**'(payload, sender, event) {
+      // only listen to specifig tracing event
+      if (event !== this.settings.sentry.tracingEventName) {
+        return
       }
-    }
+
+      this.onTracingEvent(payload)
+    },
   },
 
   /**
-	 * Methods
-	 */
+   * Methods
+   */
   methods: {
     /**
-		 * Get service name from metric event (Imported from moleculer-jaeger)
-		 *
-		 * @param {Object} metric
-		 * @returns {String}
-		 */
+     * Get service name from metric event (Imported from moleculer-jaeger)
+     *
+     * @param {Object} metric
+     * @returns {String}
+     */
     getServiceName(metric) {
       if (!metric.service && metric.action) {
         const parts = metric.action.name.split('.')
@@ -58,22 +85,41 @@ module.exports = {
     },
 
     /**
-		 * Get span name from metric event. By default it returns the action name (Imported from moleculer-jaeger)
-		 *
-		 * @param {Object} metric
-		 * @returns  {String}
-		 */
+     * Get span name from metric event. By default it returns the action name (Imported from moleculer-jaeger)
+     *
+     * @param {Object} metric
+     * @returns  {String}
+     */
     getSpanName(metric) {
       return metric.action ? metric.action.name : metric.name
     },
 
     /**
-		 * Send error to sentry, based on the metric error
-		 *
-		 * @param {Object} metric
-		 */
-    sendError(metric) {
-      Sentry.withScope(scope => {
+     * Get object key under which user is stored in service meta
+     *
+     * @returns  {String}
+     */
+    getUserMetaKey() {
+      // prefer new approach
+      if (this.settings.sentry.userMetaKey) {
+        return this.settings.sentry.userMetaKey
+      }
+
+      // fallback to old approach
+      if (this.settings.scope && this.settings.scope.user) {
+        return this.settings.scope.user
+      }
+
+      return null
+    },
+
+    /**
+     * Send error to sentry, based on the metric error
+     *
+     * @param {Object} metric
+     */
+    sendSentryError(metric) {
+      Sentry.withScope((scope) => {
         scope.setTag('id', metric.requestID)
         scope.setTag('service', this.getServiceName(metric))
         scope.setTag('span', this.getSpanName(metric))
@@ -84,8 +130,10 @@ module.exports = {
           scope.setExtra('data', metric.error.data)
         }
 
-        if (this.settings.scope && this.settings.scope.user && metric.meta && metric.meta[this.settings.scope.user]) {
-          scope.setUser(metric.meta[this.settings.scope.user])
+        const userMetaKey = this.getUserMetaKey()
+
+        if (userMetaKey && metric.meta && metric.meta[userMetaKey]) {
+          scope.setUser(metric.meta[userMetaKey])
         }
 
         Sentry.captureEvent({
@@ -96,17 +144,37 @@ module.exports = {
     },
 
     /**
-		 * Check if sentry is configured or not
-		 */
+     * Check if sentry is configured or not
+     */
     isSentryReady() {
       return Sentry.getCurrentHub().getClient() !== undefined
+    },
+
+    /**
+     * Tracing event handler
+     *
+     * @param metrics
+     * @return void
+     */
+    onTracingEvent(metrics) {
+      metrics.forEach((metric) => {
+        if (metric.error && this.isSentryReady() && (!this.shouldReport || this.shouldReport(metric) == true)) {
+          this.sendSentryError(metric)
+        }
+      })
     }
   },
+
   started() {
-    if (this.settings.dsn) {
-      Sentry.init({ dsn: this.settings.dsn, ...this.settings.options })
+    // ToDo: remove deprecated dsn and options from settings with next version
+    const dsn = this.settings.dsn || this.settings.sentry.dsn
+    const options = this.settings.options || this.settings.sentry.options
+
+    if (dsn) {
+      Sentry.init({ dsn, ...options })
     }
   },
+
   async stopped() {
     if (this.isSentryReady()) {
       await Sentry.flush()

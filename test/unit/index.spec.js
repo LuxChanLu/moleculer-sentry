@@ -2,8 +2,14 @@ const { ServiceBroker } = require('moleculer')
 const Sentry = require('@sentry/node')
 const SentryHub = require('@sentry/hub')
 
-const SentryService = require('../../index.js')
-const SentryServiceWithDSN = { ...SentryService, settings: { dsn: 'https://abc:xyz@localhost:1234/123' } }
+const SentryMixin = require('../../index.js')
+const SentryService = {
+  mixins: [SentryMixin],
+}
+const SentryServiceWithDSN = {
+  mixins: [SentryMixin],
+  settings: { sentry: { dsn: 'https://abc:xyz@localhost:1234/123' } }
+}
 
 describe('Sentry init', () => {
   it('should not init sentry', async () => {
@@ -39,35 +45,38 @@ describe('Events', () => {
   it('should not sendError (no sentry)', () => {
     const oldSentryReady = service.isSentryReady
     service.isSentryReady = jest.fn(() => false)
-    service.sendError = jest.fn()
+    service.sendSentryError = jest.fn()
 
-    broker.emit('metrics.trace.span.finish', { error: {} })
+    broker.emit('$tracing.spans', [{ error: {} }])
 
-    expect(service.sendError).not.toHaveBeenCalled()
+    expect(service.sendSentryError).not.toHaveBeenCalled()
     service.isSentryReady = oldSentryReady
   })
 
   it('should not sendError (no error)', () => {
-    service.sendError = jest.fn()
+    service.sendSentryError = jest.fn()
 
-    broker.emit('metrics.trace.span.finish', {})
+    broker.emit('$tracing.spans', [{}])
 
-    expect(service.sendError).not.toHaveBeenCalled()
+    expect(service.sendSentryError).not.toHaveBeenCalled()
   })
 
   it('should sendError', () => {
-    service.sendError = jest.fn()
+    service.sendSentryError = jest.fn()
     const error = { type: 'test', message: 'test' }
 
-    broker.emit('metrics.trace.span.finish', { error })
+    broker.emit('$tracing.spans', [{ error }])
 
-    expect(service.sendError).toHaveBeenCalledWith({ error })
+    expect(service.sendSentryError).toHaveBeenCalledWith({ error })
   })
 })
 
 describe('sendError scope', () => {
   const broker = new ServiceBroker({ logger: false })
-  const service = broker.createService({ ...SentryServiceWithDSN, settings: { ...SentryServiceWithDSN.settings, scope: { user: 'user' } } })
+  const service = broker.createService({
+    mixins: [SentryServiceWithDSN],
+    settings: { sentry: { userMetaKey: 'user' } }
+  })
 
   beforeAll(() => broker.start())
   afterAll(() => broker.stop())
@@ -75,9 +84,9 @@ describe('sendError scope', () => {
   it('should set basic tags', () => {
     const scope = new SentryHub.Scope()
     scope.setTag = jest.fn()
-    Sentry.withScope = jest.fn(cb => cb(scope))
+    Sentry.withScope = jest.fn((cb) => cb(scope))
     const error = { type: 'test', message: 'test', code: 42 }
-    service.sendError({ requestID: 'tracingid', error, service: 'errors', action: { name: 'test' } })
+    service.sendSentryError({ requestID: 'tracingid', error, service: 'errors', action: { name: 'test' } })
     expect(scope.setTag).toHaveBeenCalledTimes(5)
     expect(scope.setTag).toHaveBeenCalledWith('id', 'tracingid')
     expect(scope.setTag).toHaveBeenCalledWith('service', 'errors')
@@ -89,9 +98,9 @@ describe('sendError scope', () => {
     const scope = new SentryHub.Scope()
     scope.setTag = jest.fn()
     scope.setExtra = jest.fn()
-    Sentry.withScope = jest.fn(cb => cb(scope))
+    Sentry.withScope = jest.fn((cb) => cb(scope))
     const error = { type: 'test', message: 'test', code: 4224, data: { test: true } }
-    service.sendError({ requestID: 'tracingiddata', error, action: { name: 'testdata' } })
+    service.sendSentryError({ requestID: 'tracingiddata', error, action: { name: 'testdata' } })
     expect(scope.setTag).toHaveBeenCalledTimes(5)
     expect(scope.setTag).toHaveBeenCalledWith('id', 'tracingiddata')
     expect(scope.setTag).toHaveBeenCalledWith('span', 'testdata')
@@ -106,9 +115,14 @@ describe('sendError scope', () => {
     scope.setTag = jest.fn()
     scope.setExtra = jest.fn()
     scope.setUser = jest.fn()
-    Sentry.withScope = jest.fn(cb => cb(scope))
+    Sentry.withScope = jest.fn((cb) => cb(scope))
     const error = { type: 'test', message: 'test', code: 4224, data: { test: true } }
-    service.sendError({ requestID: 'tracingiddata', error, action: { name: 'testdata' }, meta: { user: { id: 'test', email: 'test@example.com' } } })
+    service.sendSentryError({
+      requestID: 'tracingiddata',
+      error,
+      action: { name: 'testdata' },
+      meta: { user: { id: 'test', email: 'test@example.com' } }
+    })
     expect(scope.setTag).toHaveBeenCalledTimes(5)
     expect(scope.setTag).toHaveBeenCalledWith('id', 'tracingiddata')
     expect(scope.setTag).toHaveBeenCalledWith('span', 'testdata')
@@ -132,12 +146,12 @@ describe('sendError captureMessage', () => {
   it('should capture basic message', () => {
     Sentry.captureEvent = jest.fn()
     let error = { type: 'test', message: 'test', code: 42, stack: 'stack' }
-    service.sendError({ requestID: 'tracingid', error, service: { name: 'errors' }, name: 'test' })
+    service.sendSentryError({ requestID: 'tracingid', error, service: { name: 'errors' }, name: 'test' })
     expect(Sentry.captureEvent).toHaveBeenCalledTimes(1)
     expect(Sentry.captureEvent).toHaveBeenCalledWith({ message: 'test', stacktrace: ['stack'] })
     Sentry.captureEvent.mockReset()
     error = { type: 'test', message: 'test', code: 42, stack: ['stack'] }
-    service.sendError({ requestID: 'tracingid', error, service: { name: 'errors' }, name: 'test' })
+    service.sendSentryError({ requestID: 'tracingid', error, service: { name: 'errors' }, name: 'test' })
     expect(Sentry.captureEvent).toHaveBeenCalledTimes(1)
     expect(Sentry.captureEvent).toHaveBeenCalledWith({ message: 'test', stacktrace: ['stack'] })
   })
@@ -159,17 +173,17 @@ describe('sendError with shouldReport', () => {
   afterAll(() => broker.stop())
 
   it('should report error', () => {
-    service.sendError = jest.fn()
+    service.sendSentryError = jest.fn()
     const error = { type: 'test', message: 'test', code: 42, stack: 'stack' }
-    broker.emit('metrics.trace.span.finish', { error })
-    expect(service.sendError).toHaveBeenCalledTimes(1)
+    broker.emit('$tracing.spans', [{ error }])
+    expect(service.sendSentryError).toHaveBeenCalledTimes(1)
   })
 
   it('should not report error', () => {
-    service.sendError = jest.fn()
+    service.sendSentryError = jest.fn()
     const error = { type: 'test', message: 'test', code: 24, stack: 'stack' }
-    broker.emit('metrics.trace.span.finish', { error })
-    expect(service.sendError).not.toHaveBeenCalledTimes(1)
+    broker.emit('$tracing.spans', [{ error }])
+    expect(service.sendSentryError).not.toHaveBeenCalledTimes(1)
   })
 
 })
