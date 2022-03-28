@@ -10,22 +10,28 @@
 [![Downloads](https://img.shields.io/npm/dm/moleculer-sentry.svg)](https://www.npmjs.com/package/moleculer-sentry)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FYourSoftRun%2Fmoleculer-sentry.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FYourSoftRun%2Fmoleculer-sentry?ref=badge_shield)
 
-## How to use it
+## Usage
+
+This package uses Moleculer's tracing function to catch errors and send them to sentry. In oder for it to function
+properly, you need to enable tracing and use the "Event" exporter. To see how to set up tracing, please refer to
+the [moleculer documentation](https://moleculer.services/docs/0.14/tracing.html#Event).
+
 ```js
 const SentryMixin = require('moleculer-sentry')
 
 module.exports = {
   mixins: [SentryMixin],
+
   settings: {
-    /** @type {String} DSN given by sentry. */
-    dsn: null,
-    /** @type {Object?} Additional options for `Sentry.init` */
-    options: {},
-    /** @type {Object?} Options for the sentry scope */
-    scope: {
-      /** @type {String?} Name of the meta containing user infos */
-      user: null
-    }
+    /** @type {Object?} Sentry configuration wrapper. */
+    sentry: {
+      /** @type {String} DSN given by sentry. */
+      dsn: null,
+      /** @type {Object} Additional options for `Sentry.init`. */
+      options: {},
+      /** @type {String?} Name of the meta containing user infos. */
+      userMetaKey: null,
+    },
   }
 }
 ```
