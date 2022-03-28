@@ -27,6 +27,8 @@ module.exports = {
     sentry: {
       /** @type {String} DSN given by sentry. */
       dsn: null,
+      /** @type {String} Name of event fired by "Event" exported in tracing. */
+      tracingEventName: '$tracing.spans',
       /** @type {Object} Additional options for `Sentry.init`. */
       options: {},
       /** @type {String?} Name of the meta containing user infos. */
