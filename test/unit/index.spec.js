@@ -136,6 +136,28 @@ describe('sendError scope', () => {
   })
 })
 
+describe('sendError custom trackingEventName scope', () => {
+  const customTrackingEventName = '$tracing.spans.finished';
+  const broker = new ServiceBroker({ logger: false })
+  const service = broker.createService({
+    mixins: [SentryServiceWithDSN],
+    settings: { sentry: { userMetaKey: 'user', trackingEventName: customTrackingEventName } }
+  })
+
+  beforeAll(() => broker.start())
+  afterAll(() => broker.stop())
+
+  it('should catch tracing with custom trackingEventName', () => {
+    const scope = new SentryHub.Scope()
+    Sentry.withScope = jest.fn((cb) => cb(scope))
+    service.sendSentryError = jest.fn()
+    const error = { type: 'test', message: 'test', code: 42 }
+    service.sendSentryError({ requestID: 'tracingid', error, service: 'errors', action: { name: 'test' } })
+    broker.emit(customTrackingEventName, [{ error }])
+    expect(service.sendSentryError).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('sendError captureMessage', () => {
   const broker = new ServiceBroker({ logger: false })
   const service = broker.createService(SentryServiceWithDSN)
