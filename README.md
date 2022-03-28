@@ -1,6 +1,6 @@
 # moleculer-sentry
 
-[![Build Status](https://travis-ci.org/LuxChanLu/moleculer-sentry.svg?branch=master)](https://travis-ci.org/LuxChanLu/moleculer-sentry)
+[![Tests](https://github.com/LuxChanLu/moleculer-sentry/actions/workflows/tests.yaml/badge.svg)](https://github.com/LuxChanLu/moleculer-sentry/actions/workflows/tests.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/LuxChanLu/moleculer-sentry/badge.svg?branch=master)](https://coveralls.io/github/LuxChanLu/moleculer-sentry?branch=master)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/42a2b5016bde4f2197f28389e221c61d)](https://www.codacy.com/gh/LuxChanLu/moleculer-sentry/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=LuxChanLu/moleculer-sentry&amp;utm_campaign=Badge_Grade)
 [![Maintainability](https://api.codeclimate.com/v1/badges/166736a1d7ffb6638647/maintainability)](https://codeclimate.com/github/LuxChanLu/moleculer-sentry/maintainability)

@@ -33,7 +33,7 @@
     ]
   },
   "engines": {
-    "node": ">= 8.x.x"
+    "node": ">= 12.x.x"
   },
   "dependencies": {
     "@sentry/node": "^6.19.2",
