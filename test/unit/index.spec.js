@@ -42,7 +42,7 @@ describe('Events', () => {
   beforeAll(() => broker.start())
   afterAll(() => broker.stop())
 
-  it('should not sendError (no sentry)', () => {
+  it('should not sendSentryError (no sentry)', () => {
     const oldSentryReady = service.isSentryReady
     service.isSentryReady = jest.fn(() => false)
     service.sendSentryError = jest.fn()
@@ -53,7 +53,7 @@ describe('Events', () => {
     service.isSentryReady = oldSentryReady
   })
 
-  it('should not sendError (no error)', () => {
+  it('should not sendSentryError (no error)', () => {
     service.sendSentryError = jest.fn()
 
     broker.emit(SentryMixin.settings.sentry.tracingEventName, [{}])
@@ -61,7 +61,7 @@ describe('Events', () => {
     expect(service.sendSentryError).not.toHaveBeenCalled()
   })
 
-  it('should sendError', () => {
+  it('should sendSentryError', () => {
     service.sendSentryError = jest.fn()
     const error = { type: 'test', message: 'test' }
 
@@ -71,7 +71,7 @@ describe('Events', () => {
   })
 })
 
-describe('sendError scope', () => {
+describe('sendSentryError scope', () => {
   const broker = new ServiceBroker({ logger: false })
   const service = broker.createService({
     mixins: [SentryServiceWithDSN],
@@ -136,7 +136,7 @@ describe('sendError scope', () => {
   })
 })
 
-describe('sendError custom trackingEventName scope', () => {
+describe('sendSentryError custom trackingEventName scope', () => {
   const customTrackingEventName = '$tracing.spans.finished';
   const broker = new ServiceBroker({ logger: false })
   const service = broker.createService({
@@ -158,7 +158,7 @@ describe('sendError custom trackingEventName scope', () => {
   })
 })
 
-describe('sendError captureMessage', () => {
+describe('sendSentryError captureMessage', () => {
   const broker = new ServiceBroker({ logger: false })
   const service = broker.createService(SentryServiceWithDSN)
 
@@ -180,7 +180,7 @@ describe('sendError captureMessage', () => {
 
 })
 
-describe('sendError with shouldReport', () => {
+describe('sendSentryError with shouldReport', () => {
   const broker = new ServiceBroker({ logger: false })
   const service = broker.createService({
     mixins: [SentryServiceWithDSN],
