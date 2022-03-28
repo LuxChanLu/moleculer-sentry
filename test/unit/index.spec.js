@@ -3,7 +3,10 @@ const Sentry = require('@sentry/node')
 const SentryHub = require('@sentry/hub')
 
 const SentryService = require('../../index.js')
-const SentryServiceWithDSN = { ...SentryService, settings: { dsn: 'https://abc:xyz@localhost:1234/123' } }
+const SentryServiceWithDSN = {
+  ...SentryService,
+  settings: { ...SentryService.settings, dsn: 'https://abc:xyz@localhost:1234/123' }
+}
 
 describe('Sentry init', () => {
   it('should not init sentry', async () => {
@@ -67,7 +70,10 @@ describe('Events', () => {
 
 describe('sendError scope', () => {
   const broker = new ServiceBroker({ logger: false })
-  const service = broker.createService({ ...SentryServiceWithDSN, settings: { ...SentryServiceWithDSN.settings, scope: { user: 'user' } } })
+  const service = broker.createService({
+    ...SentryServiceWithDSN,
+    settings: { ...SentryServiceWithDSN.settings, scope: { user: 'user' } }
+  })
 
   beforeAll(() => broker.start())
   afterAll(() => broker.stop())
@@ -108,7 +114,12 @@ describe('sendError scope', () => {
     scope.setUser = jest.fn()
     Sentry.withScope = jest.fn(cb => cb(scope))
     const error = { type: 'test', message: 'test', code: 4224, data: { test: true } }
-    service.sendError({ requestID: 'tracingiddata', error, action: { name: 'testdata' }, meta: { user: { id: 'test', email: 'test@example.com' } } })
+    service.sendError({
+      requestID: 'tracingiddata',
+      error,
+      action: { name: 'testdata' },
+      meta: { user: { id: 'test', email: 'test@example.com' } }
+    })
     expect(scope.setTag).toHaveBeenCalledTimes(5)
     expect(scope.setTag).toHaveBeenCalledWith('id', 'tracingiddata')
     expect(scope.setTag).toHaveBeenCalledWith('span', 'testdata')

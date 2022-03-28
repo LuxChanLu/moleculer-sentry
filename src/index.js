@@ -16,13 +16,34 @@ module.exports = {
    * Default settings
    */
   settings: {
-    /** @type {String} DSN given by sentry. */
+    /** @type {Object?} Sentry configuration wrapper. */
+    sentry: {
+      /** @type {String} DSN given by sentry. */
+      dsn: null,
+      /** @type {Object} Additional options for `Sentry.init`. */
+      options: {},
+      /** @type {String?} Name of the meta containing user infos. */
+      userMetaKey: null,
+    },
+    /**
+     * @deprecated
+     * @type {String} DSN given by sentry.
+     */
     dsn: null,
-    /** @type {Object?} Additional options for `Sentry.init` */
+    /**
+     * @deprecated
+     * @type {Object?} Additional options for `Sentry.init`
+     */
     options: {},
-    /** @type {Object?} Options for the sentry scope */
+    /**
+     * @deprecated
+     * @type {Object?} Options for the sentry scope
+     */
     scope: {
-      /** @type {String?} Name of the meta containing user infos */
+      /**
+       * @deprecated
+       * @type {String?} Name of the meta containing user infos
+       */
       user: null
     }
   },
@@ -68,6 +89,25 @@ module.exports = {
     },
 
     /**
+     * Get object key under which user is stored in service meta
+     *
+     * @returns  {String}
+     */
+    getUserMetaKey() {
+      // prefer new approach
+      if (this.settings.sentry.userMetaKey) {
+        return this.settings.sentry.userMetaKey
+      }
+
+      // fallback to old approach
+      if (this.settings.scope && this.settings.scope.user) {
+        return this.settings.scope.user
+      }
+
+      return null
+    },
+
+    /**
      * Send error to sentry, based on the metric error
      *
      * @param {Object} metric
@@ -84,8 +124,10 @@ module.exports = {
           scope.setExtra('data', metric.error.data)
         }
 
-        if (this.settings.scope && this.settings.scope.user && metric.meta && metric.meta[this.settings.scope.user]) {
-          scope.setUser(metric.meta[this.settings.scope.user])
+        const userMetaKey = this.getUserMetaKey()
+
+        if (userMetaKey && metric.meta && metric.meta[userMetaKey]) {
+          scope.setUser(metric.meta[userMetaKey])
         }
 
         Sentry.captureEvent({
@@ -102,11 +144,17 @@ module.exports = {
       return Sentry.getCurrentHub().getClient() !== undefined
     }
   },
+
   started() {
-    if (this.settings.dsn) {
-      Sentry.init({ dsn: this.settings.dsn, ...this.settings.options })
+    // ToDo: remove deprecated dsn and options from settings with next version
+    const dsn = this.settings.dsn || this.settings.sentry.dsn
+    const options = this.settings.options || this.settings.sentry.options
+
+    if (dsn) {
+      Sentry.init({ dsn, ...options })
     }
   },
+
   async stopped() {
     if (this.isSentryReady()) {
       await Sentry.flush()
