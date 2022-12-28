@@ -26,27 +26,6 @@ module.exports = {
       options: {},
       /** @type {String?} Name of the meta containing user infos. */
       userMetaKey: null,
-    },
-    /**
-     * @deprecated
-     * @type {String} DSN given by sentry.
-     */
-    dsn: null,
-    /**
-     * @deprecated
-     * @type {Object?} Additional options for `Sentry.init`
-     */
-    options: {},
-    /**
-     * @deprecated
-     * @type {Object?} Options for the sentry scope
-     */
-    scope: {
-      /**
-       * @deprecated
-       * @type {String?} Name of the meta containing user infos
-       */
-      user: null
     }
   },
 
@@ -55,7 +34,7 @@ module.exports = {
    */
   events: {
     // bind event listeners
-    '**'(payload, sender, event) {
+    '**'(payload, _, event) {
       // only listen to specifig tracing event
       if (event !== this.settings.sentry.tracingEventName) {
         return
@@ -100,17 +79,7 @@ module.exports = {
      * @returns  {String}
      */
     getUserMetaKey() {
-      // prefer new approach
-      if (this.settings.sentry.userMetaKey) {
-        return this.settings.sentry.userMetaKey
-      }
-
-      // fallback to old approach
-      if (this.settings.scope && this.settings.scope.user) {
-        return this.settings.scope.user
-      }
-
-      return null
+      return this.settings.sentry.userMetaKey
     },
 
     /**
@@ -186,9 +155,8 @@ module.exports = {
   },
 
   started() {
-    // ToDo: remove deprecated dsn and options from settings with next version
-    const dsn = this.settings.dsn || this.settings.sentry.dsn
-    const options = this.settings.options || this.settings.sentry.options
+    const dsn = this.settings.sentry.dsn
+    const options = this.settings.sentry.options
 
     if (dsn) {
       Sentry.init({ dsn, ...options })
@@ -198,7 +166,7 @@ module.exports = {
   async stopped() {
     if (this.isSentryReady()) {
       await Sentry.flush()
-      SentryUtils.getGlobalObject().__SENTRY__ = undefined
+      SentryUtils.GLOBAL_OBJ.__SENTRY__ = undefined
     }
   }
 }
