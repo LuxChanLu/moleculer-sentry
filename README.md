@@ -11,7 +11,7 @@
 
 ## Usage
 
-This package uses Moleculer's tracing function to catch errors and send them to sentry. In oder for it to function
+This package uses Moleculer's tracing function to catch errors and send them to sentry. In order for it to function
 properly, you need to enable tracing and use the "Event" exporter. To see how to set up tracing, please refer to
 the [moleculer documentation](https://moleculer.services/docs/0.14/tracing.html#Event).
 
