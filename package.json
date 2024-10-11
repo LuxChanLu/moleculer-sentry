@@ -35,7 +35,7 @@
     "node": ">= 12.x.x"
   },
   "dependencies": {
-    "@sentry/node": "^7.28.1",
+    "@sentry/node": "^7.75.0",
     "@sentry/utils": "^7.28.1"
   },
   "devDependencies": {
